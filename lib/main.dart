@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import './widgets/activity/first.dart';
 import './widgets/leftcolumn/textfield.dart';
+import './widgets/leftcolumn/fileview.dart';
+import './widgets/activity/inspector.dart';
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -15,13 +17,12 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: const Text(appTitle),
         ),
-        body: Center(
+        body: const Center(
           child: FractionallySizedBox(
             widthFactor: 0.7,
             heightFactor: 0.3,
-            child: MyCustomForm(),) ),
-        // body: Row(children: [Column(children: [FileList()],)],),
+            child: MyCustomForm()),
       ),
-    );
+    ));
   }
 }
