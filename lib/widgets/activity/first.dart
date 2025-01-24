@@ -29,19 +29,17 @@ class MyCustomFormState extends State<MyCustomForm> {
                     child: ElevatedButton(
                       onPressed: () {
                           String dir = textController.text;
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const DirectoryTree()));
                           if (dir == "") {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('路径不可为空')),
                             );
                             return;
                           }
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => DirectoryTree()));
                           storage.save("dir", dir);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('正在获取 $dir ，请稍后')),
+                            SnackBar(content: Text('正在获取 $dir ')),
                           );
-                          print(dir);
-                        
                       },
                       child: const Text('提交路径'),
                     )),
