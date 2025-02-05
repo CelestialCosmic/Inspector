@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+import '../storage/storage.dart';
 
 class FileExplorer extends StatefulWidget {
   @override
@@ -35,18 +35,22 @@ class _FileExplorerState extends State<FileExplorer> {
         files = entities;
       });
       return 1;
-    } on PathAccessException catch (e) {
+    } on PathAccessException {
       return 0;
+    } on PathNotFoundException {
+      return 2;
     }
   }
 
-  int navigateToFolder(Directory folder) {
-    setState(() {
-      previousDirectories.add(currentDirectory!);
-      currentDirectory = folder;
-      _listFiles(folder);
-    });
-    return 1;
+  void navigateToFolder(Directory folder) {
+    int status = _listFiles(folder);
+    if (status != 0) {
+      setState(() {
+        previousDirectories.add(currentDirectory!);
+        currentDirectory = folder;
+        _listFiles(folder);
+      });
+    }
   }
 
   void goBack() {
@@ -63,18 +67,16 @@ class _FileExplorerState extends State<FileExplorer> {
     List<String> list = widget.path.split('\\');
     return Scaffold(
       appBar: AppBar(
-        title: list.last == ""
-               ?Text(list[list.length-2])
-               :Text(list.last),
+        title: list.last == "" ? Text(list[list.length - 2]) : Text(list.last),
         leading: previousDirectories.isNotEmpty
             ? IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 onPressed: goBack,
               )
             : null,
       ),
       body: currentDirectory == null
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: Text("data"))
           : ListView.builder(
               itemCount: files.length,
               itemBuilder: (context, index) {
@@ -89,10 +91,84 @@ class _FileExplorerState extends State<FileExplorer> {
                       ? () {
                           navigateToFolder(entity);
                         }
-                      : null,
+                      : () {},
                 );
               },
             ),
+    );
+  }
+}
+
+class PathInput extends StatefulWidget {
+  const PathInput({super.key});
+  @override
+  PathInputState createState() {
+    return PathInputState();
+  }
+}
+
+class PathInputState extends State<PathInput> {
+  final textController = TextEditingController();
+  final storage = SharedPref();
+  @override
+  Widget build(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      TextField(
+        controller: textController,
+      ),
+      Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Center(
+            child: AbsorbPointer(
+                absorbing: false,
+                child: ElevatedButton(
+                  onPressed: () {
+                    String dir = textController.text;
+                    if (dir == "") {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('路径不可为空')),
+                      );
+                      return;
+                    }
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Inspector(path: textController.text)));
+                    storage.save("dir", dir);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('正在获取 $dir ')),
+                    );
+                  },
+                  child: const Text('提交路径'),
+                )),
+          )),
+    ]);
+  }
+}
+
+class Inspector extends StatefulWidget {
+  String path = "";
+  Inspector({required this.path});
+  State<StatefulWidget> createState() {
+    return _InspectorState();
+  }
+}
+
+class _InspectorState extends State<Inspector> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          Expanded(flex: 1, child: FileExplorer(path: widget.path)),
+          Expanded(flex: 3, child: Text("data")),
+          Expanded(
+            flex: 1,
+            child: Text("data2"),
+          )
+        ],
+      ),
     );
   }
 }
