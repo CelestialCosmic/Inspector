@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../storage/storage.dart';
 
 class FileExplorer extends StatefulWidget {
   @override
@@ -48,7 +47,6 @@ class _FileExplorerState extends State<FileExplorer> {
       setState(() {
         previousDirectories.add(currentDirectory!);
         currentDirectory = folder;
-        _listFiles(folder);
       });
     }
   }
@@ -64,111 +62,78 @@ class _FileExplorerState extends State<FileExplorer> {
 
   @override
   Widget build(BuildContext context) {
+    String? selectedFile;
     List<String> list = widget.path.split('\\');
-    return Scaffold(
-      appBar: AppBar(
-        title: list.last == "" ? Text(list[list.length - 2]) : Text(list.last),
-        leading: previousDirectories.isNotEmpty
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: goBack,
-              )
-            : null,
-      ),
-      body: currentDirectory == null
-          ? Center(child: Text("data"))
-          : ListView.builder(
-              itemCount: files.length,
-              itemBuilder: (context, index) {
-                final entity = files[index];
-                final isFolder = entity is Directory;
-                return ListTile(
-                  leading: isFolder
-                      ? Icon(Icons.folder)
-                      : Icon(Icons.insert_drive_file),
-                  title: Text(entity.path.split('\\').last),
-                  onTap: isFolder
-                      ? () {
-                          navigateToFolder(entity);
-                        }
-                      : () {},
-                );
-              },
-            ),
-    );
-  }
-}
-
-class PathInput extends StatefulWidget {
-  const PathInput({super.key});
-  @override
-  PathInputState createState() {
-    return PathInputState();
-  }
-}
-
-class PathInputState extends State<PathInput> {
-  final textController = TextEditingController();
-  final storage = SharedPref();
-  @override
-  Widget build(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      TextField(
-        controller: textController,
-      ),
-      Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Center(
-            child: AbsorbPointer(
-                absorbing: false,
-                child: ElevatedButton(
-                  onPressed: () {
-                    String dir = textController.text;
-                    if (dir == "") {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('路径不可为空')),
-                      );
-                      return;
-                    }
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                Inspector(path: textController.text)));
-                    storage.save("dir", dir);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('正在获取 $dir ')),
-                    );
-                  },
-                  child: const Text('提交路径'),
-                )),
-          )),
-    ]);
-  }
-}
-
-class Inspector extends StatefulWidget {
-  String path = "";
-  Inspector({required this.path});
-  State<StatefulWidget> createState() {
-    return _InspectorState();
-  }
-}
-
-class _InspectorState extends State<Inspector> {
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
-          Expanded(flex: 1, child: FileExplorer(path: widget.path)),
-          Expanded(flex: 3, child: Text("data")),
           Expanded(
+              flex: 1,
+              child: Scaffold(
+                appBar: AppBar(
+                  title: list.last == ""
+                      ? Text(list[list.length - 2])
+                      : Text(list.last),
+                  leading: previousDirectories.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: goBack,
+                        )
+                      : null,
+                ),
+                body: ListView.builder(
+                  itemCount: files.length,
+                  itemBuilder: (context, index) {
+                    final entity = files[index];
+                    final isFolder = entity is Directory;
+                    return ListTile(
+                      leading: isFolder
+                          ? const Icon(Icons.folder)
+                          : const Icon(Icons.insert_drive_file),
+                      title: Text(entity.path.split('\\').last),
+                      onTap: isFolder
+                          ? () {
+                              navigateToFolder(entity);
+                            }
+                          : () {
+                              setState(() {
+                                selectedFile = entity.path;
+                                print(selectedFile);
+                              });
+                            },
+                    );
+                  },
+                ),
+              )),
+          Expanded(
+              flex: 3,
+              child: Window(
+                selectedFile: selectedFile,
+              )),
+          const Expanded(
             flex: 1,
             child: Text("data2"),
           )
         ],
       ),
     );
+  }
+}
+
+class Window extends StatefulWidget {
+  _WindowState createState() => _WindowState();
+  String? selectedFile;
+  Window({super.key, required this.selectedFile});
+}
+
+class _WindowState extends State<Window> {
+  Widget build(BuildContext context) {
+    if (widget.selectedFile == null) {
+      return const Center(
+        child: Text("未选择文件"),
+      );
+    } else {
+      return Center(child: Text(widget.selectedFile!));
+    }
   }
 }

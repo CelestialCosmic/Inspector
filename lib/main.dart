@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'widgets/activity/pathinput.dart';
-import './widgets/leftcolumn/textfield.dart';
-import 'widgets/leftcolumn/filelist.dart';
-import './widgets/activity/inspector.dart';
 
 void main() => runApp(const MyApp());
 
