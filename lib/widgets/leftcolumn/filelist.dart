@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import './fileviewer/pdf.dart';
+
 class FileExplorer extends StatefulWidget {
   @override
   _FileExplorerState createState() => _FileExplorerState();
@@ -15,6 +16,7 @@ class _FileExplorerState extends State<FileExplorer> {
   List<Directory> previousDirectories = [];
   String? selectedFile;
 
+  @override
   void initState() {
     super.initState();
     _initDirectory(widget.path);
@@ -123,6 +125,7 @@ class Window extends StatelessWidget {
   final String? selectedFile;
   Window({super.key, required this.selectedFile});
 
+  int number = 1;
   @override
   Widget build(BuildContext context) {
     if (selectedFile == null) {
@@ -137,10 +140,12 @@ class Window extends StatelessWidget {
           constraints: const BoxConstraints.expand(),
           child: InteractiveViewer(child: Image.file(File(selectedFile!))));
     } else if (selectedFile!.endsWith("pdf")) {
-      return PdfViewer(selectedFile: selectedFile!);
+      final pdfController = PdfController(
+        document: PdfDocument.openFile(selectedFile!),
+      );
+      return PdfViewer(controller: pdfController);
     } else {
       return Center(child: Text("未设计打开该文件的组件:\n${selectedFile!}"));
     }
   }
 }
-

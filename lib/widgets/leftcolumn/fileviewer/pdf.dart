@@ -1,66 +1,68 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 
 class PdfViewer extends StatefulWidget {
-  late final String? selectedFile;
-  PdfViewer({super.key, required this.selectedFile});
-  State<StatefulWidget> createState() => _PdfViewerState();
+  final PdfController controller;
+  const PdfViewer({super.key, required this.controller});
+  @override
+  State<PdfViewer> createState() => _PdfViewerState();
 }
 
 class _PdfViewerState extends State<PdfViewer> {
-  final PdfController
-  void didUpdateWidget(covariant Window oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedFile != widget.selectedFile &&
-        widget.selectedFile != null) {
-      pdfController?.dispose();
-      if (widget.selectedFile!.endsWith("pdf")) {
-        setState(() {
-          pdfController = PdfController(
-            document: PdfDocument.openFile(widget.selectedFile!),
-          );
-        });
-      }
-    }
-  }
+  int _quarterTurns = 0;
 
+  void _rotateBox() {
+    setState(() {
+      _quarterTurns = (_quarterTurns + 1) % 4;
+    });
+  }
+  void _rotateBox2(){
+    setState(() {
+      _quarterTurns = (_quarterTurns - 1) % 4;
+    });
+  }
   @override
   Widget build(BuildContext context) {
-    final pdfController = PdfController(
-      document: PdfDocument.openFile(widget.selectedFile!),
-    );
     return Column(
       children: [
+        Expanded(
+          child: RotatedBox(
+            quarterTurns: _quarterTurns,
+            child:
+            PdfView(
+            controller: widget.controller,
+          )),
+        ),
+        const Padding(padding: EdgeInsets.all(8)),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
               onPressed: () {
-                pdfController.previousPage(
+                widget.controller.previousPage(
                     duration: const Duration(milliseconds: 250),
                     curve: Curves.easeIn);
               },
               child: const Icon(Icons.skip_previous),
             ),
+            const Padding(padding: EdgeInsets.only(left:8,right:8)),
             ElevatedButton(
               onPressed: () {
-                pdfController.nextPage(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeIn);
+                _rotateBox2();
               },
               child: const Icon(Icons.rotate_90_degrees_ccw_rounded),
             ),
+            const Padding(padding: EdgeInsets.only(left:8,right:8)),
             ElevatedButton(
               onPressed: () {
-                pdfController.nextPage(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeIn);
+                _rotateBox();
               },
               child: const Icon(Icons.rotate_90_degrees_cw_rounded),
             ),
+            const Padding(padding: EdgeInsets.only(left:8,right:8)),
             ElevatedButton(
               onPressed: () {
-                pdfController.nextPage(
+                widget.controller.nextPage(
                     duration: const Duration(milliseconds: 250),
                     curve: Curves.easeIn);
               },
@@ -68,11 +70,7 @@ class _PdfViewerState extends State<PdfViewer> {
             ),
           ],
         ),
-        Expanded(
-          child: PdfView(
-            controller: pdfController,
-          ),
-        ),
+        const Padding(padding: EdgeInsets.all(8)),
       ],
     );
   }
