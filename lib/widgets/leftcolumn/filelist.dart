@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:pdfx/pdfx.dart';
+import './fileviewer/image.dart';
 import './fileviewer/pdf.dart';
 
 class FileExplorer extends StatefulWidget {
   @override
   _FileExplorerState createState() => _FileExplorerState();
   final String path;
-  FileExplorer({required this.path});
+  const FileExplorer({super.key, required this.path});
 }
 
 class _FileExplorerState extends State<FileExplorer> {
@@ -132,20 +132,18 @@ class Window extends StatelessWidget {
       return const Center(
         child: Text("未选择文件"),
       );
-    } else if (selectedFile!.endsWith(("jpg")) |
-        selectedFile!.endsWith("png") |
-        selectedFile!.endsWith("jpeg") |
-        selectedFile!.endsWith("webp")) {
-      return ConstrainedBox(
-          constraints: const BoxConstraints.expand(),
-          child: InteractiveViewer(child: Image.file(File(selectedFile!))));
-    } else if (selectedFile!.endsWith("pdf")) {
-      final pdfController = PdfController(
-        document: PdfDocument.openFile(selectedFile!),
-      );
-      return PdfViewer(controller: pdfController);
     } else {
-      return Center(child: Text("未设计打开该文件的组件:\n${selectedFile!}"));
+      if (selectedFile!.endsWith(("jpg")) |
+          selectedFile!.endsWith("png") |
+          selectedFile!.endsWith("jpeg") |
+          selectedFile!.endsWith("webp")) {
+        return ImageViewer(
+          selectedFile: selectedFile!,
+        );
+      } else if (selectedFile!.endsWith("pdf")) {
+        return PdfViewer(selectedFile: selectedFile!);
+      }
     }
+    return Center(child: Text("未设计打开该文件的组件:\n${selectedFile!}"));
   }
 }

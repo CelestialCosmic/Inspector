@@ -1,19 +1,16 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:pdfx/pdfx.dart';
 
-class PdfViewer extends StatefulWidget {
+class ImageViewer extends StatefulWidget {
   final String selectedFile;
-  const PdfViewer({super.key, required this.selectedFile});
+  const ImageViewer({super.key, required this.selectedFile});
   @override
-  State<PdfViewer> createState() => _PdfViewerState();
+  State<ImageViewer> createState() => _ImageViewerState();
 }
 
-class _PdfViewerState extends State<PdfViewer> {
+class _ImageViewerState extends State<ImageViewer> {
   int _quarterTurns = 0;
-  late final controller = PdfController(
-    document: 
-  PdfDocument.openFile(widget.selectedFile)
-  );
+
   void _rotateBox() {
     setState(() {
       _quarterTurns = (_quarterTurns + 1) % 4;
@@ -33,22 +30,13 @@ class _PdfViewerState extends State<PdfViewer> {
         Expanded(
           child: RotatedBox(
               quarterTurns: _quarterTurns,
-              child: PdfView(
-                controller: controller,
-              )),
+              child: InteractiveViewer(
+                  child: Image.file(File(widget.selectedFile)))),
         ),
         const Padding(padding: EdgeInsets.all(8)),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: () {
-                controller.previousPage(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeIn);
-              },
-              child: const Icon(Icons.skip_previous),
-            ),
             const Padding(padding: EdgeInsets.only(left: 8, right: 8)),
             ElevatedButton(
               onPressed: () {
@@ -64,14 +52,6 @@ class _PdfViewerState extends State<PdfViewer> {
               child: const Icon(Icons.rotate_90_degrees_cw_rounded),
             ),
             const Padding(padding: EdgeInsets.only(left: 8, right: 8)),
-            ElevatedButton(
-              onPressed: () {
-                controller.nextPage(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeIn);
-              },
-              child: const Icon(Icons.skip_next),
-            ),
           ],
         ),
         const Padding(padding: EdgeInsets.all(8)),
