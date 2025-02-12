@@ -38,9 +38,9 @@ dependencies:
   path_provider: ^2.1.4
   shared_preferences: ^2.3.5
   file_picker: ^8.1.7
-  excel: ^4.0.6
   pdfx: ^2.8.0
   pdf: ^3.11.2
+  microsoft_viewer: ^0.0.4
 
 dev_dependencies:
   flutter_test:

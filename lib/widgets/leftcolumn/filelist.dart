@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import './fileviewer/image.dart';
 import './fileviewer/pdf.dart';
+import './fileviewer/word.dart';
 
 class FileExplorer extends StatefulWidget {
   @override
@@ -133,7 +134,7 @@ class Window extends StatelessWidget {
         child: Text("未选择文件"),
       );
     } else {
-      if (selectedFile!.endsWith(("jpg")) |
+      if (selectedFile!.endsWith("jpg") |
           selectedFile!.endsWith("png") |
           selectedFile!.endsWith("jpeg") |
           selectedFile!.endsWith("webp")) {
@@ -142,6 +143,8 @@ class Window extends StatelessWidget {
         );
       } else if (selectedFile!.endsWith("pdf")) {
         return PdfViewer(selectedFile: selectedFile!);
+      } else if (selectedFile!.endsWith("docx")) {
+        return WordViewer(selectedFile: selectedFile!);
       }
     }
     return Center(child: Text("未设计打开该文件的组件:\n${selectedFile!}"));
