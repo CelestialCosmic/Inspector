@@ -10,10 +10,8 @@ class PdfViewer extends StatefulWidget {
 
 class _PdfViewerState extends State<PdfViewer> {
   int _quarterTurns = 0;
-  late final controller = PdfController(
-    document: 
-  PdfDocument.openFile(widget.selectedFile)
-  );
+  late final controller =
+      PdfController(document: PdfDocument.openFile(widget.selectedFile));
   void _rotateBox() {
     setState(() {
       _quarterTurns = (_quarterTurns + 1) % 4;
@@ -31,11 +29,15 @@ class _PdfViewerState extends State<PdfViewer> {
     return Column(
       children: [
         Expanded(
-          child: RotatedBox(
-              quarterTurns: _quarterTurns,
-              child: PdfView(
-                controller: controller,
-              )),
+          child:
+           InteractiveViewer(
+              maxScale: 3.0,
+              minScale: 0.5,
+              child: RotatedBox(
+                  quarterTurns: _quarterTurns,
+                  child: PdfView(
+                    controller: controller,
+                  ))),
         ),
         const Padding(padding: EdgeInsets.all(8)),
         Row(

@@ -193,7 +193,9 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
   Future<void> extractMedia(ArchiveFile mediaFile, String dirPath) async {
     final String outputFilePath = dirPath + mediaFile.name.split("/").last;
     final File outFile = File(outputFilePath);
-    await outFile.writeAsBytes(mediaFile.content as List<int>);
+    try {
+      await outFile.writeAsBytes(mediaFile.content as List<int>);
+    } on PathNotFoundException catch (e) {}
   }
 
   void processWordFile(ArchiveFile wordFile) {
@@ -811,8 +813,7 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
         }
         tempList.add(Container(
           color: Colors.white,
-          // width: 500,
-          margin: const EdgeInsets.all(8),
+          // margin: const EdgeInsets.all(8),
           child: Column(
             children: pageWidgets,
           ),
@@ -832,8 +833,6 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
           scaleEnabled: false,
           child: Container(
             color: Colors.grey,
-            // height: 700,
-            // width: 500,
             child: SingleChildScrollView(
                 child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1278,21 +1277,16 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
       }
 
       htmlString = '$htmlString</body></html>';
-      sheetWidgets.add(
-        Container(
+      sheetWidgets.add(ConstrainedBox(
+        constraints: const BoxConstraints.expand(),
+        child: Container(
             color: Colors.white,
-            // width: 500,
-            margin: const EdgeInsets.all(8),
             child: SingleChildScrollView(child: HtmlWidget(htmlString))),
-      );
+      ));
     }
 
     tempList.add(
-      Container(
-          color: Colors.grey,
-          // width: 500,
-          // margin: const EdgeInsets.all(8),
-          child: Column(children: sheetWidgets)),
+      Container(color: Colors.grey, child: Column(children: sheetWidgets)),
     );
     setState(() {
       spreadSheetWidgets = tempList;
@@ -1661,8 +1655,8 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
     for (int i = 0; i < presentation.slides.length; i++) {
       List<Widget> tempSlide = [];
       List<Widget> tempShapes = [];
-      double maxWidth = 600;
-      double maxHeight = 450;
+      double minWidth = 1200;
+      double minHeight = 500;
       int divisionFactor = 12700;
       for (int j = 0;
           j < presentation.slides[i].presentationTextBoxes.length;
@@ -1671,8 +1665,8 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
                     divisionFactor +
                 presentation.slides[i].presentationTextBoxes[j].size.width /
                     divisionFactor >
-            maxWidth) {
-          maxWidth = presentation.slides[i].presentationTextBoxes[j].offset.dx /
+            minWidth) {
+          minWidth = presentation.slides[i].presentationTextBoxes[j].offset.dx /
                   divisionFactor +
               presentation.slides[i].presentationTextBoxes[j].size.width /
                   divisionFactor;
@@ -1681,8 +1675,8 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
                     divisionFactor +
                 presentation.slides[i].presentationTextBoxes[j].size.height /
                     divisionFactor >
-            maxHeight) {
-          maxHeight =
+            minHeight) {
+          minHeight =
               presentation.slides[i].presentationTextBoxes[j].offset.dy /
                       divisionFactor +
                   presentation.slides[i].presentationTextBoxes[j].size.height /
@@ -1747,8 +1741,8 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
                     divisionFactor +
                 presentation.slides[i].presentationShapes[j].size.width /
                     divisionFactor >
-            maxWidth) {
-          maxWidth = presentation.slides[i].presentationShapes[j].offset.dx /
+            minWidth) {
+          minWidth = presentation.slides[i].presentationShapes[j].offset.dx /
                   divisionFactor +
               presentation.slides[i].presentationShapes[j].size.width /
                   divisionFactor;
@@ -1757,8 +1751,8 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
                     divisionFactor +
                 presentation.slides[i].presentationShapes[j].size.height /
                     divisionFactor >
-            maxHeight) {
-          maxHeight = presentation.slides[i].presentationShapes[j].offset.dy /
+            minHeight) {
+          minHeight = presentation.slides[i].presentationShapes[j].offset.dy /
                   divisionFactor +
               presentation.slides[i].presentationShapes[j].size.height /
                   divisionFactor;
@@ -1782,40 +1776,45 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
       }
       if (tempShapes.isNotEmpty) {
         tempSlide.add(SizedBox(
-            height: maxHeight,
-            width: maxWidth,
+            height: minHeight,
+            width: minWidth,
             child: Stack(
               children: tempShapes,
             )));
       }
       slideWidgets.add(SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 450),
-          decoration: presentation.slides[i].backgroundImagePath != ""
-              ? BoxDecoration(
-                  color: Colors.white,
-                  image: DecorationImage(
-                    image: FileImage(
-                        File(presentation.slides[i].backgroundImagePath)),
-                    fit: BoxFit.fill,
-                  ),
-                )
-              : const BoxDecoration(
-                  color: Colors.white,
-                ),
-          width: maxWidth,
-          margin: const EdgeInsets.all(8),
-          child: Column(
-            children: tempSlide,
+        child: ScrollConfiguration(
+          behavior: const ScrollBehavior().copyWith(overscroll: false),
+          child: Scrollbar(
+            thickness: 10.0,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 450),
+              decoration: presentation.slides[i].backgroundImagePath != ""
+                  ? BoxDecoration(
+                      color: Colors.white,
+                      image: DecorationImage(
+                        image: FileImage(
+                            File(presentation.slides[i].backgroundImagePath)),
+                        fit: BoxFit.fill,
+                      ),
+                    )
+                  : const BoxDecoration(
+                      color: Colors.white,
+                    ),
+              width: minWidth,
+              margin: const EdgeInsets.fromLTRB(8, 8, 0, 0),
+              child: Column(
+                children: tempSlide,
+              ),
+            ),
           ),
         ),
       ));
     }
     tempList.add(Container(
       color: Colors.grey,
-      // width: 500,
-      margin: const EdgeInsets.all(8),
+      // margin: const EdgeInsets.all(8),
       child: Column(
         children: slideWidgets,
       ),
