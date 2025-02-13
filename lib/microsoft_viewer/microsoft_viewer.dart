@@ -813,7 +813,7 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
         }
         tempList.add(Container(
           color: Colors.white,
-          // margin: const EdgeInsets.all(8),
+          margin: const EdgeInsets.all(8),
           child: Column(
             children: pageWidgets,
           ),
@@ -1277,12 +1277,11 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
       }
 
       htmlString = '$htmlString</body></html>';
-      sheetWidgets.add( 
+      sheetWidgets.add(
         Container(
             color: Colors.white,
             child: SingleChildScrollView(child: HtmlWidget(htmlString))),
-      )
-      ;
+      );
     }
 
     tempList.add(
@@ -1803,7 +1802,7 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
                       color: Colors.white,
                     ),
               width: minWidth,
-              margin: const EdgeInsets.fromLTRB(8, 8, 0, 0),
+              margin: const EdgeInsets.fromLTRB(0, 0, 0, 8),
               child: Column(
                 children: tempSlide,
               ),
@@ -1814,7 +1813,7 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
     }
     tempList.add(Container(
       color: Colors.grey,
-      // margin: const EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       child: Column(
         children: slideWidgets,
       ),
