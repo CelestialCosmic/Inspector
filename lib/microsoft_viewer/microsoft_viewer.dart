@@ -1277,12 +1277,12 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
       }
 
       htmlString = '$htmlString</body></html>';
-      sheetWidgets.add(ConstrainedBox(
-        constraints: const BoxConstraints.expand(),
-        child: Container(
+      sheetWidgets.add( 
+        Container(
             color: Colors.white,
             child: SingleChildScrollView(child: HtmlWidget(htmlString))),
-      ));
+      )
+      ;
     }
 
     tempList.add(
