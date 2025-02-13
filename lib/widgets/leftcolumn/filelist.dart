@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import './fileviewer/image.dart';
 import './fileviewer/pdf.dart';
-import './fileviewer/word.dart';
+import 'fileviewer/office.dart';
 
 class FileExplorer extends StatefulWidget {
   @override
@@ -143,8 +143,10 @@ class Window extends StatelessWidget {
         );
       } else if (selectedFile!.endsWith("pdf")) {
         return PdfViewer(selectedFile: selectedFile!);
-      } else if (selectedFile!.endsWith("docx")) {
-        return WordViewer(selectedFile: selectedFile!);
+      } else if (selectedFile!.endsWith("docx") |
+          selectedFile!.endsWith("xlsx")|
+          selectedFile!.endsWith("pptx")) {
+        return OfficeViewer(selectedFile: selectedFile!);
       }
     }
     return Center(child: Text("未设计打开该文件的组件:\n${selectedFile!}"));

@@ -41,6 +41,10 @@ dependencies:
   pdfx: ^2.8.0
   pdf: ^3.11.2
   microsoft_viewer: ^0.0.4
+  xml: ^6.5.0
+  collection: ^1.19.0
+  flutter_widget_from_html: ^0.15.3
+  archive: ^4.0.2
 
 dev_dependencies:
   flutter_test:
