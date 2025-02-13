@@ -195,7 +195,7 @@ class MicrosoftViewerState extends State<MicrosoftViewer> {
     final File outFile = File(outputFilePath);
     try {
       await outFile.writeAsBytes(mediaFile.content as List<int>);
-    } on PathNotFoundException catch (e) {}
+    } on PathNotFoundException {}
   }
 
   void processWordFile(ArchiveFile wordFile) {

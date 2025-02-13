@@ -124,9 +124,7 @@ class _FileExplorerState extends State<FileExplorer> {
 
 class Window extends StatelessWidget {
   final String? selectedFile;
-  Window({super.key, required this.selectedFile});
-
-  int number = 1;
+  const Window({super.key, required this.selectedFile});
   @override
   Widget build(BuildContext context) {
     if (selectedFile == null) {
