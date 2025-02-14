@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import '../../../microsoft_viewer/microsoft_viewer.dart';
-// import 'package:microsoft_viewer/microsoft_viewer.dart';
 
 class OfficeViewer extends StatefulWidget {
   final String selectedFile;
@@ -13,8 +12,13 @@ class OfficeViewer extends StatefulWidget {
 
 class _OfficeViewerState extends State<OfficeViewer> {
   late MicrosoftViewer microsoftViewer = const MicrosoftViewer([]);
+  bool _isLoading = true;
 
   Future<void> getExternalFile() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       File file = File(widget.selectedFile);
       Uint8List fileBytes = await file.readAsBytes();
@@ -24,8 +28,13 @@ class _OfficeViewerState extends State<OfficeViewer> {
           fileBytes,
           key: newKey,
         );
+        _isLoading = false;
       });
-    } catch (e) {}
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -36,7 +45,18 @@ class _OfficeViewerState extends State<OfficeViewer> {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-        constraints: const BoxConstraints.expand(), child: microsoftViewer);
+    return Stack(
+      children: [
+        if (_isLoading)
+          const Center(
+            child: CircularProgressIndicator(),
+          )
+        else
+          ConstrainedBox(
+            constraints: const BoxConstraints.expand(),
+            child: microsoftViewer,
+          ),
+      ],
+    );
   }
 }

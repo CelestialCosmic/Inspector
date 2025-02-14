@@ -12,6 +12,8 @@ class _PdfViewerState extends State<PdfViewer> {
   int _quarterTurns = 0;
   late final controller =
       PdfController(document: PdfDocument.openFile(widget.selectedFile));
+  bool _isLoading = true;
+
   void _rotateBox() {
     setState(() {
       _quarterTurns = (_quarterTurns + 1) % 4;
@@ -25,19 +27,43 @@ class _PdfViewerState extends State<PdfViewer> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadPdf();
+  }
+
+  Future<void> _loadPdf() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Expanded(
-          child:
-           InteractiveViewer(
-              maxScale: 3.0,
-              minScale: 0.5,
-              child: RotatedBox(
-                  quarterTurns: _quarterTurns,
-                  child: PdfView(
-                    controller: controller,
-                  ))),
+          child: Stack(
+            children: [
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                )
+              else
+                InteractiveViewer(
+                  maxScale: 3.0,
+                  minScale: 0.5,
+                  child: RotatedBox(
+                    quarterTurns: _quarterTurns,
+                    child: PdfView(controller: controller),
+                  ),
+                ),
+            ],
+          ),
         ),
         const Padding(padding: EdgeInsets.all(8)),
         Row(
@@ -53,16 +79,12 @@ class _PdfViewerState extends State<PdfViewer> {
             ),
             const Padding(padding: EdgeInsets.only(left: 8, right: 8)),
             ElevatedButton(
-              onPressed: () {
-                _rotateBox2();
-              },
+              onPressed: _rotateBox2,
               child: const Icon(Icons.rotate_90_degrees_ccw_rounded),
             ),
             const Padding(padding: EdgeInsets.only(left: 8, right: 8)),
             ElevatedButton(
-              onPressed: () {
-                _rotateBox();
-              },
+              onPressed: _rotateBox,
               child: const Icon(Icons.rotate_90_degrees_cw_rounded),
             ),
             const Padding(padding: EdgeInsets.only(left: 8, right: 8)),
